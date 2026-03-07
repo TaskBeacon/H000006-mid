@@ -1,0 +1,231 @@
+subinfo_fields:
+  - name: subject_id
+    type: string
+
+subinfo_mapping:
+  subject_id: Subject ID
+
+window:
+  size: [1920, 1080]
+  units: deg
+  screen: 0
+  bg_color: gray
+  fullscreen: true
+  fullscreen_lock_escape: true
+  monitor_width_cm: 60
+  monitor_distance_cm: 72
+
+task:
+  task_name: eeg_mid_preview
+  language: Chinese
+  voice_enabled: true
+  voice_name: zh-CN-YunyangNeural
+  total_blocks: 1
+  total_trials: 18
+  trial_per_block: 18
+  conditions: [win, lose, neut]
+  input_mode: keyboard
+  hide_cursor: true
+  key_list: [space]
+  delta: 10
+  seed_mode: same_across_sub
+  overall_seed: 2025
+
+stimuli:
+  fixation:
+    type: text
+    text: +
+    color: black
+  win_cue:
+    type: circle
+    radius: 3
+    fillColor: magenta
+    lineColor: black
+  lose_cue:
+    type: rect
+    width: 6
+    height: 6
+    fillColor: yellow
+    lineColor: black
+  neut_cue:
+    type: polygon
+    edges: 3
+    size: 6
+    fillColor: cyan
+    lineColor: black
+  win_target:
+    type: circle
+    radius: 3
+    fillColor: black
+    lineColor: black
+  lose_target:
+    type: rect
+    width: 6
+    height: 6
+    fillColor: black
+    lineColor: black
+  neut_target:
+    type: polygon
+    edges: 3
+    size: 6
+    fillColor: black
+    lineColor: black
+  win_hit_feedback:
+    type: textbox
+    text: |
+      击中
+
+      +10 分
+    color: black
+    font: SimHei
+    alignment: center
+    letterHeight: 0.78
+  win_miss_feedback:
+    type: textbox
+    text: |
+      未击中
+
+      +0 分
+    color: black
+    font: SimHei
+    alignment: center
+    letterHeight: 0.78
+  lose_hit_feedback:
+    type: textbox
+    text: |
+      击中
+
+      -0 分
+    color: black
+    font: SimHei
+    alignment: center
+    letterHeight: 0.78
+  lose_miss_feedback:
+    type: textbox
+    text: |
+      未击中
+
+      -10 分
+    color: black
+    font: SimHei
+    alignment: center
+    letterHeight: 0.78
+  neut_hit_feedback:
+    type: textbox
+    text: |
+      击中
+
+      +0 分
+    color: black
+    font: SimHei
+    alignment: center
+    letterHeight: 0.78
+  neut_miss_feedback:
+    type: textbox
+    text: |
+      未击中
+
+      -0 分
+    color: black
+    font: SimHei
+    alignment: center
+    letterHeight: 0.78
+  block_break:
+    type: text
+    text: |
+      第 {block_num} / {total_blocks} 部分完成
+      击中率：{accuracy:.2f}
+      总分：{total_score}
+
+      请在充分休息后按下空格键
+      进入下一个部分
+    color: black
+    font: SimHei
+    height: 0.78
+  instruction_text:
+    type: textbox
+    text: |
+      【奖赏任务说明】
+      接下来，您将参与一个反应任务
+      每个试次开始时，屏幕上会出现一个提示图形
+      它表示当前的得分条件：
+
+      红色圆形代表：奖励条件,有机会获得 10 分
+      黄色方块代表：惩罚条件,有可能扣除 10 分
+      蓝色三角代表：中性条件,不会得分或扣分
+
+      提示图形出现后，将呈现一个黑色目标图形
+      您的任务是在目标出现时尽快
+
+      用右手食指按下【空格键】
+
+      击中目标:可能获得奖励或避免失分
+      未击中目标:可能会错失奖励或被扣分
+
+      注意：目标呈现的时间不固定
+      请尽量快速且准确地在目标呈现时击中目标
+
+      在目标出现前按键会被视为未击中
+
+      请按【空格键】开始任务
+    color: black
+    font: SimHei
+    alignment: center
+    letterHeight: 0.72
+    units: deg
+    size: [20, 5]
+  good_bye:
+    type: text
+    text: |
+      任务结束
+
+      最后得分:{total_score}
+      感谢您的参与
+      请按【空格键】键退出
+    color: white
+    font: SimHei
+    height: 0.78
+
+timing:
+  fixation_duration: [0.6, 0.8]
+  cue_duration: 0.3
+  anticipation_duration: [1, 1.2]
+  prefeedback_duration: [0.6, 0.8]
+  feedback_duration: 1
+
+triggers:
+  map:
+    exp_onset: 98
+    exp_end: 99
+    win_cue_onset: 10
+    lose_cue_onset: 20
+    neut_cue_onset: 30
+    win_anti_onset: 11
+    lose_anti_onset: 21
+    neut_anti_onset: 31
+    win_target_onset: 12
+    lose_target_onset: 22
+    neut_target_onset: 32
+    win_hit_fb_onset: 13
+    lose_hit_fb_onset: 23
+    neut_hit_fb_onset: 33
+    win_miss_fb_onset: 14
+    lose_miss_fb_onset: 24
+    neut_miss_fb_onset: 34
+    win_key_press: 15
+    lose_key_press: 25
+    neut_key_press: 35
+    win_no_response: 16
+    lose_no_response: 26
+    neut_no_response: 36
+    block_onset: 100
+    block_end: 101
+    fixation_onset: 1
+
+controller:
+  initial_duration: 0.2
+  min_duration: 0.04
+  max_duration: 0.37
+  step: 0.03
+  target_accuracy: 0.66
+  condition_specific: true
