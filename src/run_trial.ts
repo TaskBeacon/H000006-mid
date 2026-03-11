@@ -77,7 +77,8 @@ export function run_trial(
     .captureResponse({
       keys: keyList,
       duration: () => resolveTargetDuration(),
-      correct_keys: keyList
+      correct_keys: keyList,
+      grace_s: Number(settings.response_grace_s ?? 0)
     })
     .set_state({
       target_duration_s: () => resolveTargetDuration()

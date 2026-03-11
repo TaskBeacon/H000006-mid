@@ -27,6 +27,7 @@ task:
   input_mode: keyboard
   hide_cursor: true
   key_list: [space]
+  response_grace_s: 0.15
   delta: 10
   seed_mode: same_across_sub
   overall_seed: 2025

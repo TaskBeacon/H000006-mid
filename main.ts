@@ -22,6 +22,8 @@ import { Controller } from "./src/controller";
 import { run_trial } from "./src/run_trial";
 import * as utils from "./src/utils";
 
+const instructionVoiceAsset = new URL("./assets/instruction_text_voice.mp3", import.meta.url).href;
+
 function buildWaitTrial(
   meta: { trial_id: string; condition: string; trial_index: number },
   blockId: string | null,
@@ -52,7 +54,11 @@ export async function run(root: HTMLElement): Promise<void> {
   if (settings.voice_enabled) {
     stimBank.convert_to_voice("instruction_text", {
       voice: String(settings.voice_name ?? "en-US"),
-      rate: 1
+      rate: 1,
+      assetFiles: {
+        instruction_text: instructionVoiceAsset
+      },
+      fallbackToSpeech: false
     });
   }
 
