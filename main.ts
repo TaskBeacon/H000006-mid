@@ -40,7 +40,7 @@ function buildWaitTrial(
 }
 
 export async function run(root: HTMLElement): Promise<void> {
-  const parsed = parsePsyflowConfig(configText);
+  const parsed = parsePsyflowConfig(configText, import.meta.url);
   const settings = TaskSettings.from_dict(parsed.task_config);
   const subInfo = new SubInfo(parsed.subform_config);
   const stimBank = new StimBank(parsed.stim_config);

@@ -22,6 +22,7 @@ export function run_trial(
   const { settings, stimBank, controller } = context;
   const keyList = (settings.key_list as string[]) ?? ["space"];
   const delta = Number(settings.delta ?? 10);
+  const resolveTargetDuration = () => controller.get_duration(condition);
 
   trial
     .unit("cue")
@@ -57,12 +58,10 @@ export function run_trial(
     })
     .to_dict();
 
-  const targetDuration = controller.get_duration(condition);
   const target = trial.unit("target").addStim(stimBank.get(`${condition}_target`));
   set_trial_context(target, {
     trial_id: trial.trial_id,
     phase: "target_response_window",
-    deadline_s: targetDuration,
     valid_keys: [...keyList],
     block_id: trial.block_id,
     condition_id: condition,
@@ -70,16 +69,18 @@ export function run_trial(
       condition,
       stage: "target_response_window",
       trial_index: trial.trial_index,
-      block_id: trial.block_id,
-      target_duration_s: targetDuration
+      block_id: trial.block_id
     },
     stim_id: `${condition}_target`
   });
   target
     .captureResponse({
       keys: keyList,
-      duration: targetDuration,
+      duration: () => resolveTargetDuration(),
       correct_keys: keyList
+    })
+    .set_state({
+      target_duration_s: () => resolveTargetDuration()
     })
     .to_dict();
 
