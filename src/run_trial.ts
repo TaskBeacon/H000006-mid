@@ -17,18 +17,34 @@ export function run_trial(
     stimBank: StimBank;
     controller: Controller;
     utils: typeof utils;
+    block_id?: string | null;
+    block_idx?: number;
   }
 ): TrialBuilder {
   const { settings, stimBank, controller } = context;
   const keyList = (settings.key_list as string[]) ?? ["space"];
   const delta = Number(settings.delta ?? 10);
+  const triggerMap = (settings.triggers ?? {}) as Record<string, unknown>;
+  const blockId = context.block_id ?? trial.block_id;
+  const blockIdx = context.block_idx;
   const resolveTargetDuration = () => controller.get_duration(condition);
 
-  trial
-    .unit("cue")
-    .addStim(stimBank.get(`${condition}_cue`))
-    .show({ duration: Number(settings.cue_duration ?? 0.3) })
-    .to_dict();
+  const cue = trial.unit("cue").addStim(stimBank.get(`${condition}_cue`));
+  set_trial_context(cue, {
+    trial_id: trial.trial_id,
+    phase: "cue",
+    deadline_s: Number(settings.cue_duration ?? 0.3),
+    valid_keys: [],
+    block_id: blockId,
+    condition_id: condition,
+    task_factors: {
+      condition,
+      stage: "cue",
+      block_idx: blockIdx
+    },
+    stim_id: `${condition}_cue`
+  });
+  cue.show({ duration: Number(settings.cue_duration ?? 0.3) }).to_dict();
 
   const anticipation = trial.unit("anticipation").addStim(stimBank.get("fixation"));
   set_trial_context(anticipation, {
@@ -36,13 +52,12 @@ export function run_trial(
     phase: "anticipation_fixation",
     deadline_s: (settings.anticipation_duration as number | number[] | null | undefined) ?? null,
     valid_keys: [...keyList],
-    block_id: trial.block_id,
+    block_id: blockId,
     condition_id: condition,
     task_factors: {
       condition,
       stage: "anticipation_fixation",
-      trial_index: trial.trial_index,
-      block_id: trial.block_id
+      block_idx: blockIdx
     },
     stim_id: "fixation"
   });
@@ -63,13 +78,12 @@ export function run_trial(
     trial_id: trial.trial_id,
     phase: "target_response_window",
     valid_keys: [...keyList],
-    block_id: trial.block_id,
+    block_id: blockId,
     condition_id: condition,
     task_factors: {
       condition,
       stage: "target_response_window",
-      trial_index: trial.trial_index,
-      block_id: trial.block_id
+      block_idx: blockIdx
     },
     stim_id: `${condition}_target`
   });
@@ -78,27 +92,57 @@ export function run_trial(
       keys: keyList,
       duration: () => resolveTargetDuration(),
       correct_keys: keyList,
-      grace_s: Number(settings.response_grace_s ?? 0)
+      grace_s: Number(settings.response_grace_s ?? 0),
+      response_trigger: Number(triggerMap[`${condition}_key_press`] ?? 0),
+      timeout_trigger: Number(triggerMap[`${condition}_no_response`] ?? 0)
     })
     .set_state({
       target_duration_s: () => resolveTargetDuration()
     })
     .to_dict();
 
-  trial
-    .unit("prefeedback_fixation")
-    .addStim(stimBank.get("fixation"))
+  const prefeedback = trial.unit("prefeedback_fixation").addStim(stimBank.get("fixation"));
+  set_trial_context(prefeedback, {
+    trial_id: trial.trial_id,
+    phase: "prefeedback_fixation",
+    deadline_s: (settings.prefeedback_duration as number | number[] | null | undefined) ?? null,
+    valid_keys: [],
+    block_id: blockId,
+    condition_id: condition,
+    task_factors: {
+      condition,
+      stage: "prefeedback_fixation",
+      block_idx: blockIdx
+    },
+    stim_id: "fixation"
+  });
+  prefeedback
     .show({
       duration: (settings.prefeedback_duration as number | number[] | null | undefined) ?? null
     })
     .to_dict();
 
-  trial
+  const feedback = trial
     .unit("feedback")
     .addStim((snapshot: TrialSnapshot) => {
       const outcome = utils.resolveMidOutcome(snapshot, condition, delta);
       return stimBank.get(`${condition}_${outcome.hit_type}_feedback`);
-    })
+    });
+  set_trial_context(feedback, {
+    trial_id: trial.trial_id,
+    phase: "feedback",
+    deadline_s: Number(settings.feedback_duration ?? 1),
+    valid_keys: [],
+    block_id: blockId,
+    condition_id: condition,
+    task_factors: {
+      condition,
+      stage: "feedback",
+      block_idx: blockIdx
+    },
+    stim_id: "feedback"
+  });
+  feedback
     .show({ duration: Number(settings.feedback_duration ?? 1) })
     .set_state({
       hit: (snapshot: TrialSnapshot) => utils.resolveMidOutcome(snapshot, condition, delta).hit,

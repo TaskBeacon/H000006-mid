@@ -118,7 +118,9 @@ export async function run(root: HTMLElement): Promise<void> {
             settings,
             stimBank,
             controller,
-            utils
+            utils,
+            block_id: block.block_id,
+            block_idx: blockIndex
           });
           compiledTrials.push(trial.build());
         });
